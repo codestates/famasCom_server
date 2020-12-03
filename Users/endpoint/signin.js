@@ -1,6 +1,5 @@
 const Response = require("../common/API_Response");
 const Dynamo = require("../common/Dynamo");
-const TableName = { TableName: "Users" };
 
 exports.handler = async (event) => {
   event = JSON.parse(event.body);
@@ -14,17 +13,19 @@ exports.handler = async (event) => {
     Response._400({
       message: "Post must have a email and password and they must not be empty",
     });
+    return null;
   }
   let userData = event;
 
-  const data = await Dynamo._signUp(userData, TableName).catch((err) => {
+  const data = await Dynamo._signIn(userData).catch((err) => {
     console.log("error in Dynamo userData post", err);
     return null;
   });
 
   if (data) {
     //return data
-    return Response._200({ message: "It's a success. userData" });
+    return Response._200({ message: "It's a success. signin", data });
+  } else {
+    return Response._400({ message: "Failed signin." });
   }
-  return Response._400({ message: "already used." });
 };
