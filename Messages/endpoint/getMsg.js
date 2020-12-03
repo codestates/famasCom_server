@@ -9,12 +9,7 @@ exports.handler = async (event) => {
   }
 
   let msgId = event.pathParameters.msgId;
-  console.log(
-    "🚀 ~ file: getMsg.js ~ line 12 ~ exports.handler= ~ msgId",
-    msgId
-  );
-
-  const user = await Dynamo.get(msgId).catch((err) => {
+  const user = await Dynamo._get(msgId).catch((err) => {
     console.log("error in Dynamo Get", err);
     return null;
   });

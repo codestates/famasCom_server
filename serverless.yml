@@ -30,7 +30,7 @@ provider:
     - Effect: Allow
       Action:
         - dynamodb:*
-      Resource: "*"
+      Resource: "arn:aws:dynamodb:${self:provider.region}"
 plugins:
   - serverless-webpack
 package:
@@ -89,12 +89,47 @@ functions:
           path: post-msg/
           method: post
           cors: ture
-          postMsg:
+  modifyMsg:
+    handler: Messages/endpoint/modifyMsg.handler
+    events:
+      - http:
+          path: update-msgData/{msgId}
+          method: post
+          cors: ture
+  deleteMsgData:
+    handler: Messages/endpoint/deleteMsgData.handler
+    events:
+      - http:
+          path: delete-msgData/{msgId}
+          method: post
+          cors: ture
+
   signup:
     handler: Users/endpoint/signup.handler
     events:
       - http:
           path: post-user/
+          method: post
+          cors: ture
+  signin:
+    handler: Users/endpoint/signin.handler
+    events:
+      - http:
+          path: signin-user/
+          method: post
+          cors: ture
+  modifyUser:
+    handler: Users/endpoint/modifyUser.handler
+    events:
+      - http:
+          path: update-userData/{userId}
+          method: post
+          cors: ture
+  deleteUserData:
+    handler: Users/endpoint/deleteUserData.handler
+    events:
+      - http:
+          path: delete-userData/{userId}
           method: post
           cors: ture
 #      - websocket: $connect
@@ -136,14 +171,16 @@ functions:
 #     usersTable:
 #       Type: AWS::DynamoDB::Table
 #       Properties:
-#         TableName: Users
 #         AttributeDefinitions:
-#           - AttributeName: user_name
-#           - AttributeType: S
+#           - AttributeName: "userId"
+#           - AttributeType: "S"
 #         KeySchema:
-#           - AttributeName: user_name
-#             keyType: HASH
-#         BillingMode: PAY_PER_REQUEST
+#           - AttributeName: "userId"
+#             keyType: "HASH"
+#         ProvisionedThroughput:
+#           ReadCapacityUnits: 1
+#           WriteCapacityUnits: 1
+#         TableName: Users
 #    NewResource:
 #      Type: AWS::S3::Bucket
 #      Properties:

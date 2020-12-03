@@ -1,5 +1,6 @@
 const AWS = require("aws-sdk");
 const documentClient = new AWS.DynamoDB.DocumentClient();
+const { v4: uuidv4 } = require("uuid");
 
 AWS.config.update({
   region: "ap-northeast-2",
@@ -7,25 +8,54 @@ AWS.config.update({
 });
 
 const Dynamo = {
-  async get(msgId) {
-    console.log("🚀 ~ file: Dynamo.js ~ line 11 ~ get ~ msgId", msgId);
+  //Messages 삭제
+  async _delete(msgId) {
+    let deleteParams = {
+      Key: {
+        msgId: msgId,
+      },
+      TableName: "Messages",
+    };
+    return await documentClient.delete(deleteParams).promise();
+  },
+  //Messages 수정
+  async _update(msgData, msgId) {
+    const { userName, msg } = msgData;
+    let updateParams = {
+      Key: {
+        msgId: msgId,
+      },
+      TableName: "Messages",
+      ConditionExpression: "attribute_exists(msgId)",
+      UpdateExpression:
+        "SET userName = :userName, msg = :msg, updateAt = :updateAt",
+      ExpressionAttributeValues: {
+        ":userName": userName,
+        ":msg": msg,
+        ":updateAt": new Date().toISOString(),
+      },
+      ReturnValues: "ALL_NEW",
+    };
+    let data = await documentClient.update(updateParams).promise();
+    return data;
+  },
+  //Messages 필터
+  async _get(msgId) {
     let params = {
       TableName: "Messages",
-      Key: { msgId },
+      Key: { msgId: msgId },
     };
     let data = await documentClient.get(params).promise();
-    console.log("🚀 ~ file: Dynamo.js ~ line 17 ~ get ~ data", data);
 
     if (!data || !data.Item) {
       throw Error(
         `There was an error fetching the data for msgId of ${msgId} from ${TableName}`
       );
     }
-    console.log(data);
     return data.Item;
   },
-
-  async scan() {
+  //Messages 올 렌더(render)
+  async _scan() {
     let scanParams = {
       TableName: "Messages",
     };
@@ -35,16 +65,17 @@ const Dynamo = {
     }
     return data;
   },
-  async write(dataMsg, TableName) {
+  //Messages 쓰기
+  async _write(dataMsg, TableName) {
     let putParams = {
       TableName: "Messages",
       Item: {
-        msgId: Math.floor(Math.random() * 100000),
+        msgId: uuidv4(),
         userName: dataMsg.usedName,
         msg: dataMsg.msg,
         like: 0,
         comments: [],
-        createdAt: `${new Date().getFullYear()}년 ${new Date().getMonth()}월 ${new Date().getDate()}일 ${new Date().getHours()}시 ${new Date().getMinutes()}분 ${new Date().getSeconds()}초`,
+        createdAt: new Date().toISOString(),
       },
     };
     let data = await documentClient.put(putParams).promise();

@@ -7,7 +7,7 @@ exports.handler = async (event) => {
     Response._400({ message: "missing the usedName from the path" });
   }
 
-  const data = await Dynamo.scan().catch((err) => {
+  const data = await Dynamo._scan().catch((err) => {
     console.log("error in Dynamo Get", err);
     return null;
   });
