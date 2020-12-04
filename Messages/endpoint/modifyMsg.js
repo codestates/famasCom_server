@@ -2,7 +2,7 @@ const Response = require("../common/API_Response");
 const Dynamo = require("../common/Dynamo");
 
 exports.handler = async (event) => {
-  const msgId = event.pathParameters.msgId;
+  const { msgId } = event.pathParameters;
   event = JSON.parse(event.body);
   if (!event.pathParameters || !event.pathParameters.msgId) {
     //failed
@@ -28,7 +28,7 @@ exports.handler = async (event) => {
 
   if (data) {
     //return data
-    return Response._200({ message: "It's a success. modify msgData", data });
+    return Response._200({ message: "The message has been modified.", data });
   }
-  return Response._400({ message: "Failed modify. msgData" });
+  return Response._400({ message: "The message has failed to be modified." });
 };
