@@ -26,7 +26,10 @@ exports.handler = async (event) => {
 
   if (data) {
     //return data
-    return Response._200({ message: "It's a success. modify", data });
+    return Response._200({
+      message: "Modification of member information has been completed.",
+      data,
+    });
   }
-  return Response._400({ message: "Failed modify." });
+  return Response._400({ message: "Member information modification failed." });
 };
