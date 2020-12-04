@@ -38,7 +38,7 @@ const Dynamo = {
       TableName: "Users",
       ConditionExpression: "attribute_exists(userId)",
       UpdateExpression:
-        "SET nickName = :nickName, password = :password, user_name = :user_name updateAt = :updateAt",
+        "SET nickName = :nickName, password = :password, user_name = :user_name, updateAt = :updateAt",
       ExpressionAttributeValues: {
         ":nickName": nickName,
         ":password": hashPassword(password),
