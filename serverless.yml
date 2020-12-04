@@ -103,6 +103,20 @@ functions:
           path: delete-msgData/{msgId}
           method: post
           cors: ture
+  addLike:
+    handler: Messages/endpoint/addLike.handler
+    events:
+      - http:
+          path: addLike/{msgId}
+          method: post
+          cors: ture
+  addComment:
+    handler: Messages/endpoint/addComment.handler
+    events:
+      - http:
+          path: addComment/{msgId}
+          method: post
+          cors: ture
 
   signup:
     handler: Users/endpoint/signup.handler
