@@ -9,7 +9,9 @@ exports.handler = async (event, callback) => {
   });
   if (data) {
     //return data
-    return Response._200({ message: "It's a success. delete" });
+    return Response._200({
+      message: "Member information has been successfully deleted.",
+    });
   }
-  return Response._400({ message: "Failed delete." });
+  return Response._400({ message: "Failed to delete member information." });
 };
