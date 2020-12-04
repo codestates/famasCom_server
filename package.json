@@ -1,0 +1,24 @@
+{
+  "name": "FAMAS_server",
+  "version": "1.0.0",
+  "description": "README.md",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/godkor200/FAMAS_server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/godkor200/FAMAS_server/issues"
+  },
+  "homepage": "https://github.com/godkor200/FAMAS_server#readme",
+  "dependencies": {
+    "crypto-js": "^4.0.0",
+    "uuid": "^8.3.1"
+  }
+}
