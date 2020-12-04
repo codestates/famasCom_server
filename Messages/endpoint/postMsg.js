@@ -17,7 +17,7 @@ exports.handler = async (event) => {
 
   if (data) {
     //return data
-    return Response._200({ message: "It's a success. postMsg" });
+    return Response._200({ message: "The message has been sent successfully" });
   }
-  return Response._400({ message: "Failed. postMsg" });
+  return Response._400({ message: "Message transmission failed." });
 };
