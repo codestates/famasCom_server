@@ -24,7 +24,7 @@ exports.handler = async (event) => {
 
   if (data) {
     //return data
-    return Response._200({ message: "It's a success. userData" });
+    return Response._200({ message: "userData has been successfully sent." });
   }
-  return Response._400({ message: "already used." });
+  return Response._400({ message: "already used email." });
 };
