@@ -8,7 +8,7 @@ exports.handler = async (event) => {
     Response._400({ message: "missing the msgId from the path" });
   }
 
-  let msgId = event.pathParameters.msgId;
+  const { msgId } = event.pathParameters;
   const user = await Dynamo._get(msgId).catch((err) => {
     console.log("error in Dynamo Get", err);
     return null;
