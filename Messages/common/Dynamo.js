@@ -1,5 +1,6 @@
 const AWS = require("aws-sdk");
 const documentClient = new AWS.DynamoDB.DocumentClient();
+const dynamodb = new AWS.DynamoDB();
 const { v4: uuidv4 } = require("uuid");
 
 AWS.config.update({
@@ -8,6 +9,46 @@ AWS.config.update({
 });
 
 const Dynamo = {
+  async _addComment(msgId, CommentData) {
+    const { cmt, cmtName } = CommentData;
+    console.log(
+      "🚀 ~ file: Dynamo.js ~ line 14 ~ _addComment ~ cmtName",
+      cmtName,
+      cmt
+    );
+    let cmtParams = {
+      Key: {
+        msgId: { S: msgId },
+      },
+      TableName: "Messages",
+      ConditionExpression: "attribute_exists(msgId)",
+      UpdateExpression: "SET #ri = list_append(#ri,:vals)",
+      ExpressionAttributeNames: {
+        "#ri": "comments",
+      },
+      ExpressionAttributeValues: {
+        ":vals": { L: [{ M: [{ S: cmtName }, { S: cmt }] }] },
+      },
+      ReturnValues: "ALL_NEW",
+    };
+    return await dynamodb.updateItem(cmtParams).promise();
+  },
+  //Messages 좋아요 추가
+  async _addLike(msgId) {
+    let likeParams = {
+      Key: {
+        msgId: { S: msgId },
+      },
+      TableName: "Messages",
+      ConditionExpression: "attribute_exists(msgId)",
+      UpdateExpression: "SET goodLike = goodLike + :val ",
+      ExpressionAttributeValues: {
+        ":val": { N: "1" },
+      },
+      ReturnValues: "ALL_NEW",
+    };
+    return await dynamodb.updateItem(likeParams).promise();
+  },
   //Messages 삭제
   async _delete(msgId) {
     let deleteParams = {
@@ -54,7 +95,7 @@ const Dynamo = {
     }
     return data.Item;
   },
-  //Messages 올 렌더(render)
+  //Messages all render
   async _scan() {
     let scanParams = {
       TableName: "Messages",
@@ -67,12 +108,14 @@ const Dynamo = {
   },
   //Messages 쓰기
   async _write(dataMsg, TableName) {
+    const { usedName, msg } = dataMsg;
+
     let putParams = {
       TableName: "Messages",
       Item: {
         msgId: uuidv4(),
-        userName: dataMsg.usedName,
-        msg: dataMsg.msg,
+        userName: usedName,
+        msg: msg,
         like: 0,
         comments: [],
         createdAt: new Date().toISOString(),
