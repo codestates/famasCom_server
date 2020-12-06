@@ -2,18 +2,18 @@ const AWS = require("aws-sdk");
 const documentClient = new AWS.DynamoDB.DocumentClient();
 const { v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
-
+const salt = process.env.USER_PW_SALT;
+const hashMethod = process.env.HASH_METHOD;
+const digest = process.env.DIGEST;
 AWS.config.update({
   region: "ap-northeast-2",
   endpoint: "http://dynamodb.ap-northeast-2.amazonaws.com",
 });
 
 function hashPassword(password) {
-  let salt = "random string";
-  let shasum = crypto.createHash("sha1");
+  let shasum = crypto.createHash(hashMethod);
   shasum.update(password + salt);
-  let result = shasum.digest("hex");
-  console.log("🚀 ~ file: Dynamo.js ~ line 16 ~ hashPassword ~ result", result);
+  let result = shasum.digest(digest);
   return result;
 }
 
@@ -97,7 +97,7 @@ const Dynamo = {
           Item: {
             userId: uuidv4(),
             email: email,
-            password: password,
+            password: hashPassword(password),
             createdAt: new Date().toISOString(),
           },
         };
