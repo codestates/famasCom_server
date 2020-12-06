@@ -35,8 +35,9 @@ plugins:
   - serverless-webpack
 package:
   individually: true
-# custom:
-#   TableName: users
+custom:
+  dynamodb:
+  TableName: Users
 
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
@@ -55,8 +56,6 @@ package:
 #            - "/*"
 
 # you can define service wide environment variables here
-#  environment:
-#    variable1: value1
 
 # you can add packaging information here
 #package:
@@ -125,6 +124,10 @@ functions:
           path: post-user/
           method: post
           cors: ture
+    environment:
+      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT},
+      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD},
+      DIGEST: ${file(./config/config.js):USER_DATA_CONFIG.dev.DIGEST}
   signin:
     handler: Users/endpoint/signin.handler
     events:
@@ -132,6 +135,10 @@ functions:
           path: signin-user/
           method: post
           cors: ture
+    environment:
+      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT},
+      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD},
+      DIGEST: ${file(./config/config.js):USER_DATA_CONFIG.dev.DIGEST}
   modifyUser:
     handler: Users/endpoint/modifyUser.handler
     events:
@@ -139,6 +146,10 @@ functions:
           path: update-userData/{userId}
           method: post
           cors: ture
+    environment:
+      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT},
+      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD},
+      DIGEST: ${file(./config/config.js):USER_DATA_CONFIG.dev.DIGEST}
   deleteUserData:
     handler: Users/endpoint/deleteUserData.handler
     events:
