@@ -125,8 +125,8 @@ functions:
           method: post
           cors: ture
     environment:
-      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT},
-      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD},
+      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT}
+      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD}
       DIGEST: ${file(./config/config.js):USER_DATA_CONFIG.dev.DIGEST}
   signin:
     handler: Users/endpoint/signin.handler
@@ -136,8 +136,8 @@ functions:
           method: post
           cors: ture
     environment:
-      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT},
-      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD},
+      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT}
+      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD}
       DIGEST: ${file(./config/config.js):USER_DATA_CONFIG.dev.DIGEST}
   modifyUser:
     handler: Users/endpoint/modifyUser.handler
@@ -147,8 +147,8 @@ functions:
           method: post
           cors: ture
     environment:
-      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT},
-      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD},
+      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT}
+      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD}
       DIGEST: ${file(./config/config.js):USER_DATA_CONFIG.dev.DIGEST}
   deleteUserData:
     handler: Users/endpoint/deleteUserData.handler

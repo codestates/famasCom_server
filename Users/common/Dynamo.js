@@ -4,17 +4,18 @@ const { v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 const salt = process.env.USER_PW_SALT;
 const hashMethod = process.env.HASH_METHOD;
-const digest = process.env.DIGEST;
+const DIGEST = process.env.DIGEST;
+
 AWS.config.update({
   region: "ap-northeast-2",
   endpoint: "http://dynamodb.ap-northeast-2.amazonaws.com",
 });
 
 function hashPassword(password) {
-  let shasum = crypto.createHash(hashMethod);
-  shasum.update(password + salt);
-  let result = shasum.digest(digest);
-  return result;
+  return crypto
+    .createHash(hashMethod)
+    .update(password + salt)
+    .digest(DIGEST);
 }
 
 const Dynamo = {
@@ -79,16 +80,9 @@ const Dynamo = {
     let data = await documentClient.scan(idScan).promise();
     let seached = { data }.data.Items;
     const { email, password } = userData;
-    console.log(
-      "🚀 ~ file: Dynamo.js ~ line 82 ~ _signUp ~ password",
-      password
-    );
 
     for (let i = 0; i < seached.length; i++) {
-      if (
-        seached[i].email === email &&
-        seached[i].password === hashPassword(password)
-      ) {
+      if (seached[i].email === email) {
         // 중복아이디인 경우
         return;
       } else {

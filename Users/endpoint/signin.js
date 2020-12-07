@@ -24,12 +24,12 @@ exports.handler = async (event) => {
 
   if (data) {
     //return data
-    return Response._200({
+    return Response._201({
       message: "Login completed successfully.",
       //TODO : SESSION 구현이나 JWT
       data,
     });
   } else {
-    return Response._400({ message: "Login failed successfully." });
+    return Response._400({ message: "Login failed." });
   }
 };
