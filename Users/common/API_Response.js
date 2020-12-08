@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken");
+
 const Responses = {
   _200(data = {}) {
     return {
@@ -12,16 +14,16 @@ const Responses = {
   },
   _201(data = {}) {
     const { userId } = data.data;
+    const token = jwt.sign({ userId: userId }, process.env.JWT_SECRET);
     return {
       headers: {
         Content_Type: "application/json",
         "Access-Control-Allow-Methods": "*",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Credentials": true,
-        "Set-Cookie": `mycookie=${userId}; SameSite=None; domain=localhost; Path=/; secure; HttpOnly;`,
       },
       statusCode: 201,
-      body: JSON.stringify(data),
+      body: JSON.stringify({ data: data, token }),
     };
   },
   _400(data = {}) {

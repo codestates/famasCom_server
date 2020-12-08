@@ -1,8 +1,8 @@
 const Response = require("../common/API_Response");
 const Dynamo = require("../common/Dynamo");
-const TableName = { TableName: "Messages" };
 
 exports.handler = async (event) => {
+  let userId = event.requestContext.authorizer.principalId;
   event = JSON.parse(event.body);
   if (!event) {
     //failed
@@ -10,7 +10,7 @@ exports.handler = async (event) => {
   }
   let dataMsg = event;
 
-  const data = await Dynamo._write(dataMsg, TableName).catch((err) => {
+  const data = await Dynamo._write(dataMsg, userId).catch((err) => {
     console.log("error in Dynamo post", err);
     return null;
   });

@@ -2,6 +2,7 @@ const Response = require("../common/API_Response");
 const Dynamo = require("../common/Dynamo");
 
 exports.handler = async (event) => {
+  let userId = event.requestContext.authorizer.principalId;
   const { msgId } = event.pathParameters;
   event = JSON.parse(event.body);
   if (!event.pathParameters || !event.pathParameters.msgId) {
@@ -21,7 +22,7 @@ exports.handler = async (event) => {
   }
   let msgData = event;
 
-  const data = await Dynamo._update(msgData, msgId).catch((err) => {
+  const data = await Dynamo._update(msgData, msgId, userId).catch((err) => {
     console.log("error in Dynamo msgData update", err);
     return null;
   });
