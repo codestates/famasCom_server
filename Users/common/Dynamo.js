@@ -19,6 +19,14 @@ function hashPassword(password) {
 }
 
 const Dynamo = {
+  //Users 유저 찾기, 첫 프론트페이지 render
+  async _search(userId) {
+    let searchParams = {
+      TableName: "Users",
+      Key: { userId: userId },
+    };
+    return await documentClient.get(searchParams).promise();
+  },
   //Users 삭제
   async _delete(userId) {
     let deleteParams = {
