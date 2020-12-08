@@ -19,6 +19,7 @@
   "homepage": "https://github.com/godkor200/FAMAS_server#readme",
   "dependencies": {
     "crypto-js": "^4.0.0",
+    "jsonwebtoken": "^8.5.1",
     "uuid": "^8.3.1"
   }
 }
