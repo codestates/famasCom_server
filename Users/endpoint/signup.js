@@ -1,6 +1,5 @@
 const Response = require("../common/API_Response");
 const Dynamo = require("../common/Dynamo");
-const TableName = { TableName: "Users" };
 
 exports.handler = async (event) => {
   event = JSON.parse(event.body);
@@ -17,7 +16,7 @@ exports.handler = async (event) => {
   }
   let userData = event;
 
-  const data = await Dynamo._signUp(userData, TableName).catch((err) => {
+  const data = await Dynamo._signUp(userData).catch((err) => {
     console.log("error in Dynamo userData post", err);
     return null;
   });
