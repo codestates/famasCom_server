@@ -74,7 +74,6 @@ functions:
           path: hello/
           method: post
           cors: ture
-          authorizer: validate
 
   getMsg:
     handler: Messages/endpoint/getMsg.handler
@@ -83,6 +82,7 @@ functions:
           path: get-msg/{msgId}
           method: get
           cors: ture
+
   getMsgs:
     handler: Messages/endpoint/getMsgs.handler
     events:
@@ -90,6 +90,7 @@ functions:
           path: get-msg/
           method: get
           cors: ture
+
   postMsg:
     handler: Messages/endpoint/postMsg.handler
     events:
@@ -107,6 +108,7 @@ functions:
           method: post
           cors: ture
           authorizer: validate
+
   deleteMsgData:
     handler: Messages/endpoint/deleteMsgData.handler
     events:
@@ -114,7 +116,7 @@ functions:
           path: delete-msgData/{msgId}
           method: post
           cors: ture
-          authorizer: validate
+
   addLike:
     handler: Messages/endpoint/addLike.handler
     events:
@@ -122,6 +124,7 @@ functions:
           path: addLike/{msgId}
           method: post
           cors: ture
+
   addComment:
     handler: Messages/endpoint/addComment.handler
     events:
@@ -147,6 +150,25 @@ functions:
       USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT}
       HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD}
       DIGEST: ${file(./config/config.js):USER_DATA_CONFIG.dev.DIGEST}
+
+  kakaoSignIn:
+    handler: Users/endpoint/kakaoSignIn.handler
+    events:
+      - http:
+          path: kakaoSignIn/{userId}
+          method: post
+          cors: ture
+    environment:
+      JWT_SECRET: ${file(./config/config.js):USER_DATA_CONFIG.dev.JWT_SECRET}
+
+  kakaoSignUp:
+    handler: Users/endpoint/kakaoSignUp.handler
+    events:
+      - http:
+          path: kakaoSignUp/
+          method: post
+          cors: ture
+
   signin:
     handler: Users/endpoint/signin.handler
     events:
@@ -159,6 +181,7 @@ functions:
       HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD}
       DIGEST: ${file(./config/config.js):USER_DATA_CONFIG.dev.DIGEST}
       JWT_SECRET: ${file(./config/config.js):USER_DATA_CONFIG.dev.JWT_SECRET}
+
   modifyUser:
     handler: Users/endpoint/modifyUser.handler
     events:
@@ -171,6 +194,7 @@ functions:
       USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT}
       HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD}
       DIGEST: ${file(./config/config.js):USER_DATA_CONFIG.dev.DIGEST}
+
   deleteUserData:
     handler: Users/endpoint/deleteUserData.handler
     events:
@@ -213,6 +237,17 @@ functions:
 #      variable2: value2
 
 # you can add CloudFormation resource templates here
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: "AWS::ApiGateway::GatewayResponse"
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: "ApiGatewayRestApi"
 # resources:
 #   Resources:
 #     usersTable:
