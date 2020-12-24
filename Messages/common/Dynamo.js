@@ -1,7 +1,8 @@
 const AWS = require("aws-sdk");
 const documentClient = new AWS.DynamoDB.DocumentClient();
 const dynamodb = new AWS.DynamoDB();
-const { v4: uuidv4 } = require("uuid");
+const userDb = require("../../Users/common/Dynamo");
+const { v1: uuidv1 } = require("uuid");
 
 AWS.config.update({
   region: "ap-northeast-2",
@@ -42,7 +43,13 @@ const Dynamo = {
         "#ri": "comments",
       },
       ExpressionAttributeValues: {
-        ":vals": { L: [{ M: [{ S: await getUserName(userId) }, { S: cmt }] }] },
+        ":vals": {
+          L: [
+            {
+              M: [{ S: await getUserName(userId) }, { S: cmt }],
+            },
+          ],
+        },
       },
       ReturnValues: "ALL_NEW",
     };
@@ -65,11 +72,10 @@ const Dynamo = {
     return await dynamodb.updateItem(likeParams).promise();
   },
   //Messages 삭제
-  async _delete(msgId, userId) {
+  async _delete(msgId) {
     let deleteParams = {
       Key: {
         msgId: msgId,
-        userId: userId,
       },
       TableName: "Messages",
     };
@@ -125,17 +131,24 @@ const Dynamo = {
   //Messages 쓰기
   async _write(dataMsg, userId) {
     const { msg } = dataMsg;
-
+    const userData = await userDb._search(userId);
+    console.log(
+      "🚀 ~ file: Dynamo.js ~ line 135 ~ _write ~ data",
+      userData.Item.profileImage
+    );
+    const catchPo = (userData) =>
+      userData.Item.profileImage ? userData.Item.profileImage : null;
     let putParams = {
       TableName: "Messages",
       Item: {
-        msgId: uuidv4(),
+        msgId: uuidv1(),
         userName: await getUserName(userId),
         msg: msg,
-        like: 0,
+        goodLike: 0,
         comments: [],
         createdAt: new Date().toISOString(),
         userId: userId,
+        profileImage: catchPo(userData),
       },
     };
     let data = await documentClient.put(putParams).promise();
