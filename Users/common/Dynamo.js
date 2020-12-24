@@ -80,6 +80,26 @@ const Dynamo = {
       }
     }
   },
+  //카카오톡 로그인
+  async _kakaoSignIn(userId) {
+    return await this._search(userId)
+      .then((data) => data)
+      .catch((err) => err);
+  },
+  async _kakaoSignUp(userData) {
+    const { email, nickName, profileImage, userId } = userData;
+    const putParams = {
+      TableName: "Users",
+      Item: {
+        userId: userId,
+        email: email,
+        nickName: nickName,
+        profileImage: profileImage,
+        createdAt: new Date().toISOString(),
+      },
+    };
+    return await documentClient.put(putParams).promise();
+  },
   //Users 회원가입
   async _signUp(userData, TableName) {
     let idScan = {
@@ -92,7 +112,7 @@ const Dynamo = {
     for (let i = 0; i < seached.length; i++) {
       if (seached[i].email === email) {
         // 중복아이디인 경우
-        return;
+        return null;
       } else {
         let putParams = {
           TableName: "Users",
