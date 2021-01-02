@@ -74,7 +74,9 @@ functions:
           path: hello/
           method: post
           cors: ture
-
+  environment:
+      KAKAO_SECRET: ${file(./config/config.js):USER_DATA_CONFIG.dev.KAKAO_SECRET}
+      
   getMsg:
     handler: Messages/endpoint/getMsg.handler
     events:
