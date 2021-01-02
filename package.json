@@ -1,0 +1,30 @@
+{
+  "name": "FAMAS_server",
+  "version": "1.0.0",
+  "description": "README.md",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/godkor200/FAMAS_server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/godkor200/FAMAS_server/issues"
+  },
+  "homepage": "https://github.com/godkor200/FAMAS_server#readme",
+  "dependencies": {
+    "aws-sdk": "^2.814.0",
+    "crypto-js": "^4.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "uuid": "^8.3.1",
+    "webpack": "^5.11.0"
+  },
+  "devDependencies": {
+    "serverless-webpack": "^5.3.5"
+  }
+}

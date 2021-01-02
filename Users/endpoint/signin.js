@@ -1,0 +1,35 @@
+const Response = require("../common/API_Response");
+const Dynamo = require("../common/Dynamo");
+
+exports.handler = async (event) => {
+  event = JSON.parse(event.body);
+  if (
+    !event.email ||
+    event.email.trim() === "" ||
+    !event.password ||
+    event.password.trim() === ""
+  ) {
+    //failed
+    Response._400({
+      message: "Post must have a email and password and they must not be empty",
+    });
+    return null;
+  }
+  let userData = event;
+
+  const data = await Dynamo._signIn(userData).catch((err) => {
+    console.log("error in Dynamo userData post", err);
+    return null;
+  });
+
+  if (data) {
+    //return data
+    return Response._201({
+      message: "Login completed successfully.",
+      //TODO : SESSION 구현이나 JWT
+      data,
+    });
+  } else {
+    return Response._400({ message: "Login failed." });
+  }
+};
