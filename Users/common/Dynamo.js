@@ -4,20 +4,29 @@ const { v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 const salt = process.env.USER_PW_SALT;
 const hashMethod = process.env.HASH_METHOD;
-const digest = process.env.DIGEST;
+const DIGEST = process.env.DIGEST;
+
 AWS.config.update({
   region: "ap-northeast-2",
   endpoint: "http://dynamodb.ap-northeast-2.amazonaws.com",
 });
 
 function hashPassword(password) {
-  let shasum = crypto.createHash(hashMethod);
-  shasum.update(password + salt);
-  let result = shasum.digest(digest);
-  return result;
+  return crypto
+    .createHash(hashMethod)
+    .update(password + salt)
+    .digest(DIGEST);
 }
 
 const Dynamo = {
+  //Users 유저 찾기, 첫 프론트페이지 render
+  async _search(userId) {
+    let searchParams = {
+      TableName: "Users",
+      Key: { userId: userId },
+    };
+    return await documentClient.get(searchParams).promise();
+  },
   //Users 삭제
   async _delete(userId) {
     let deleteParams = {
@@ -71,6 +80,26 @@ const Dynamo = {
       }
     }
   },
+  //카카오톡 로그인
+  async _kakaoSignIn(userId) {
+    return await this._search(userId)
+      .then((data) => data)
+      .catch((err) => err);
+  },
+  async _kakaoSignUp(userData) {
+    const { email, nickName, profileImage, userId } = userData;
+    const putParams = {
+      TableName: "Users",
+      Item: {
+        userId: userId,
+        email: email,
+        nickName: nickName,
+        profileImage: profileImage,
+        createdAt: new Date().toISOString(),
+      },
+    };
+    return await documentClient.put(putParams).promise();
+  },
   //Users 회원가입
   async _signUp(userData, TableName) {
     let idScan = {
@@ -79,18 +108,11 @@ const Dynamo = {
     let data = await documentClient.scan(idScan).promise();
     let seached = { data }.data.Items;
     const { email, password } = userData;
-    console.log(
-      "🚀 ~ file: Dynamo.js ~ line 82 ~ _signUp ~ password",
-      password
-    );
 
     for (let i = 0; i < seached.length; i++) {
-      if (
-        seached[i].email === email &&
-        seached[i].password === hashPassword(password)
-      ) {
+      if (seached[i].email === email) {
         // 중복아이디인 경우
-        return;
+        return null;
       } else {
         let putParams = {
           TableName: "Users",

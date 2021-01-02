@@ -14,10 +14,6 @@ exports.handler = async (event) => {
 
   if (data) {
     //return data
-    console.log(
-      "🚀 ~ file: getMsgs.js ~ line 18 ~ exports.handler= ~ data",
-      data
-    );
     return Response._200({ message: "Data successfully loaded.", data });
   }
   return Response._400({ message: "The data is not available." });

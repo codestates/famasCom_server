@@ -1,21 +1,37 @@
 const AWS = require("aws-sdk");
 const documentClient = new AWS.DynamoDB.DocumentClient();
 const dynamodb = new AWS.DynamoDB();
-const { v4: uuidv4 } = require("uuid");
+const userDb = require("../../Users/common/Dynamo");
+const { v1: uuidv1 } = require("uuid");
 
 AWS.config.update({
   region: "ap-northeast-2",
   endpoint: "http://dynamodb.ap-northeast-2.amazonaws.com",
 });
 
+async function getUserName(userId) {
+  let searchParams = {
+    TableName: "Users",
+    Key: { userId: userId },
+  };
+  let data = await documentClient
+    .get(searchParams)
+    .promise()
+    .catch((err) => {
+      console.log("error in Dynamo Get username", err);
+      return null;
+    });
+  let usernickName = data.Item.nickName;
+  let userName = data.Item.email;
+  if (usernickName) {
+    return usernickName;
+  } else {
+    return userName;
+  }
+}
 const Dynamo = {
-  async _addComment(msgId, CommentData) {
-    const { cmt, cmtName } = CommentData;
-    console.log(
-      "🚀 ~ file: Dynamo.js ~ line 14 ~ _addComment ~ cmtName",
-      cmtName,
-      cmt
-    );
+  async _addComment(msgId, CommentData, userId) {
+    const { cmt } = CommentData;
     let cmtParams = {
       Key: {
         msgId: { S: msgId },
@@ -27,7 +43,13 @@ const Dynamo = {
         "#ri": "comments",
       },
       ExpressionAttributeValues: {
-        ":vals": { L: [{ M: [{ S: cmtName }, { S: cmt }] }] },
+        ":vals": {
+          L: [
+            {
+              M: [{ S: await getUserName(userId) }, { S: cmt }],
+            },
+          ],
+        },
       },
       ReturnValues: "ALL_NEW",
     };
@@ -60,8 +82,8 @@ const Dynamo = {
     return await documentClient.delete(deleteParams).promise();
   },
   //Messages 수정
-  async _update(msgData, msgId) {
-    const { userName, msg } = msgData;
+  async _update(msgData, msgId, userId) {
+    const { msg } = msgData;
     let updateParams = {
       Key: {
         msgId: msgId,
@@ -71,7 +93,7 @@ const Dynamo = {
       UpdateExpression:
         "SET userName = :userName, msg = :msg, updateAt = :updateAt",
       ExpressionAttributeValues: {
-        ":userName": userName,
+        ":userName": await getUserName(userId),
         ":msg": msg,
         ":updateAt": new Date().toISOString(),
       },
@@ -107,18 +129,26 @@ const Dynamo = {
     return data;
   },
   //Messages 쓰기
-  async _write(dataMsg, TableName) {
-    const { usedName, msg } = dataMsg;
-
+  async _write(dataMsg, userId) {
+    const { msg } = dataMsg;
+    const userData = await userDb._search(userId);
+    console.log(
+      "🚀 ~ file: Dynamo.js ~ line 135 ~ _write ~ data",
+      userData.Item.profileImage
+    );
+    const catchPo = (userData) =>
+      userData.Item.profileImage ? userData.Item.profileImage : null;
     let putParams = {
       TableName: "Messages",
       Item: {
-        msgId: uuidv4(),
-        userName: usedName,
+        msgId: uuidv1(),
+        userName: await getUserName(userId),
         msg: msg,
-        like: 0,
+        goodLike: 0,
         comments: [],
         createdAt: new Date().toISOString(),
+        userId: userId,
+        profileImage: catchPo(userData),
       },
     };
     let data = await documentClient.put(putParams).promise();

@@ -39,34 +39,44 @@ custom:
   dynamodb:
   TableName: Users
 
-# you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
+  # you can add statements to the Lambda function's IAM Role here
+  #  iamRoleStatements:
+  #    - Effect: "Allow"
+  #      Action:
+  #        - "s3:ListBucket"
+  #      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+  #    - Effect: "Allow"
+  #      Action:
+  #        - "s3:PutObject"
+  #      Resource:
+  #        Fn::Join:
+  #          - ""
+  #          - - "arn:aws:s3:::"
+  #            - "Ref" : "ServerlessDeploymentBucket"
+  #            - "/*"
 
-# you can define service wide environment variables here
+  # you can define service wide environment variables here
 
-# you can add packaging information here
-#package:
-#  include:
-#    - include-me.js
-#    - include-me-dir/**
-#  exclude:
-#    - exclude-me.js
-#    - exclude-me-dir/**
+  # you can add packaging information here
+  #package:
+  #  include:
+  #    - include-me.js
+  #    - include-me-dir/**
+  #  exclude:
+  #    - exclude-me.js
+  #    - exclude-me-dir/**
 
 functions:
+  hello:
+    handler: hello.handler
+    events:
+      - http:
+          path: hello/
+          method: post
+          cors: ture
+  environment:
+      KAKAO_SECRET: ${file(./config/config.js):USER_DATA_CONFIG.dev.KAKAO_SECRET}
+      
   getMsg:
     handler: Messages/endpoint/getMsg.handler
     events:
@@ -74,6 +84,7 @@ functions:
           path: get-msg/{msgId}
           method: get
           cors: ture
+
   getMsgs:
     handler: Messages/endpoint/getMsgs.handler
     events:
@@ -81,6 +92,7 @@ functions:
           path: get-msg/
           method: get
           cors: ture
+
   postMsg:
     handler: Messages/endpoint/postMsg.handler
     events:
@@ -88,6 +100,8 @@ functions:
           path: post-msg/
           method: post
           cors: ture
+          authorizer: validate
+
   modifyMsg:
     handler: Messages/endpoint/modifyMsg.handler
     events:
@@ -95,6 +109,8 @@ functions:
           path: update-msgData/{msgId}
           method: post
           cors: ture
+          authorizer: validate
+
   deleteMsgData:
     handler: Messages/endpoint/deleteMsgData.handler
     events:
@@ -102,6 +118,7 @@ functions:
           path: delete-msgData/{msgId}
           method: post
           cors: ture
+
   addLike:
     handler: Messages/endpoint/addLike.handler
     events:
@@ -109,6 +126,7 @@ functions:
           path: addLike/{msgId}
           method: post
           cors: ture
+
   addComment:
     handler: Messages/endpoint/addComment.handler
     events:
@@ -116,6 +134,12 @@ functions:
           path: addComment/{msgId}
           method: post
           cors: ture
+          authorizer: validate
+
+  validate:
+    handler: Utils/validate.handler
+    environment:
+      JWT_SECRET: ${file(./config/config.js):USER_DATA_CONFIG.dev.JWT_SECRET}
 
   signup:
     handler: Users/endpoint/signup.handler
@@ -125,9 +149,28 @@ functions:
           method: post
           cors: ture
     environment:
-      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT},
-      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD},
+      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT}
+      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD}
       DIGEST: ${file(./config/config.js):USER_DATA_CONFIG.dev.DIGEST}
+
+  kakaoSignIn:
+    handler: Users/endpoint/kakaoSignIn.handler
+    events:
+      - http:
+          path: kakaoSignIn/{userId}
+          method: post
+          cors: ture
+    environment:
+      JWT_SECRET: ${file(./config/config.js):USER_DATA_CONFIG.dev.JWT_SECRET}
+
+  kakaoSignUp:
+    handler: Users/endpoint/kakaoSignUp.handler
+    events:
+      - http:
+          path: kakaoSignUp/
+          method: post
+          cors: ture
+
   signin:
     handler: Users/endpoint/signin.handler
     events:
@@ -136,27 +179,32 @@ functions:
           method: post
           cors: ture
     environment:
-      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT},
-      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD},
+      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT}
+      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD}
       DIGEST: ${file(./config/config.js):USER_DATA_CONFIG.dev.DIGEST}
+      JWT_SECRET: ${file(./config/config.js):USER_DATA_CONFIG.dev.JWT_SECRET}
+
   modifyUser:
     handler: Users/endpoint/modifyUser.handler
     events:
       - http:
-          path: update-userData/{userId}
+          path: update-userData/
           method: post
           cors: ture
+          authorizer: validate
     environment:
-      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT},
-      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD},
+      USER_PW_SALT: ${file(./config/config.js):USER_DATA_CONFIG.dev.USER_PW_SALT}
+      HASH_METHOD: ${file(./config/config.js):USER_DATA_CONFIG.dev.HASH_METHOD}
       DIGEST: ${file(./config/config.js):USER_DATA_CONFIG.dev.DIGEST}
+
   deleteUserData:
     handler: Users/endpoint/deleteUserData.handler
     events:
       - http:
-          path: delete-userData/{userId}
+          path: delete-userData/
           method: post
           cors: ture
+          authorizer: validate
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
@@ -191,6 +239,17 @@ functions:
 #      variable2: value2
 
 # you can add CloudFormation resource templates here
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: "AWS::ApiGateway::GatewayResponse"
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: "ApiGatewayRestApi"
 # resources:
 #   Resources:
 #     usersTable:

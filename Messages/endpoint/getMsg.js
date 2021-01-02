@@ -1,4 +1,3 @@
-"use strict";
 const Response = require("../common/API_Response");
 const Dynamo = require("../common/Dynamo");
 

@@ -2,7 +2,7 @@ const Response = require("../common/API_Response");
 const Dynamo = require("../common/Dynamo");
 
 exports.handler = async (event) => {
-  const userId = event.pathParameters.userId;
+  let userId = event.requestContext.authorizer.principalId;
   event = JSON.parse(event.body);
   if (
     !event.user_name ||
